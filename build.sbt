@@ -10,8 +10,8 @@ description := "Scala utility wrappers for integrating with AWS Lambda functions
 licenses += ("Mozilla Public License 2.0", url("https://www.mozilla.org/en-US/MPL/2.0"))
 scmInfo := Some(
   ScmInfo(
-    url("https://github.com/Hub-of-all-Things/hat-client-scala-play"),
-    "scm:git@github.com:Hub-of-all-Things/hat-client-scala-play.git"
+    url("https://github.com/Hub-of-all-Things/aws-lambda-scala-handler"),
+    "scm:git@github.com:Hub-of-all-Things/aws-lambda-scala-handler.git"
   )
 )
 homepage := Some(url("https://hubofallthings.com"))
