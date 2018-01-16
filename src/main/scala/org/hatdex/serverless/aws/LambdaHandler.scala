@@ -22,8 +22,6 @@ trait LambdaStreamHandler[I, O] {
 
   // This function will ultimately be used as the external handler
   final def handle(handler: ( (I, Context) => Future[O]))(input: InputStream, output: OutputStream, context: Context): Unit = {
-    implicit val c: Context = context
-
     val body = scala.io.Source.fromInputStream(input).mkString
     val read: Try[JsResult[I]] = Try(Json.parse(body))
       .map(_.validate[I])
