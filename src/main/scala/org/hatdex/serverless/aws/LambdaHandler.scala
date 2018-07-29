@@ -18,15 +18,15 @@ trait LambdaStreamHandler[I, O] {
   protected implicit val executionContext: ExecutionContext
   val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  protected implicit val errorResponseWrites: Writes[ErrorResponse] = proxy.JsonProtocol.errorResponseWrites
+  protected implicit val errorResponseWrites: Writes[ErrorResponse] = proxy.ProxyJsonProtocol.errorResponseWrites
 
   // This function will ultimately be used as the external handler
-  final def handle(handler: ( (I, Context) => Future[O]))(input: InputStream, output: OutputStream, context: Context): Unit = {
+  final def handle(handler: (I, Context) => Future[O])(input: InputStream, output: OutputStream, context: Context): Unit = {
     val body = scala.io.Source.fromInputStream(input).mkString
     val read: Try[JsResult[I]] = Try(Json.parse(body))
       .map(_.validate[I])
       .recover {
-        case e: JsonParseException =>
+        case _: JsonParseException =>
           logger.debug("JSON parsing exception, trying to convert string to type directly")
           JsSuccess(body.asInstanceOf[I])
       }
@@ -69,19 +69,19 @@ trait LambdaStreamHandler[I, O] {
 abstract class LambdaHandler[I, O]()(implicit val inputReads: Reads[I], val outputWrites: Writes[O]) extends LambdaStreamHandler[I, O] {
 
   final def handle(input: InputStream, output: OutputStream, context: Context): Unit =
-    handle(handleAsync _)(input, output, context)
+    handle(handleAsync)(input, output, context)
 
   protected val executionContext: ExecutionContext = ExecutionContext.global
   final protected def handleAsync(i: I, c: Context): Future[O] = Future.fromTry(handle(i, c))
 
-  protected def handle(i: I,  c: Context): Try[O]
+  def handle(i: I,  c: Context): Try[O]
 }
 
-abstract class LambdaHandlerAsync[I, O]()(implicit val inputReads: Reads[I], val outputWrites: Writes[O]) extends LambdaStreamHandler[I, O] {
+abstract class LambdaHandlerAsync[I, O]()(implicit val inputReads: Reads[I], val outputWrites: Writes[O], val executionContext: ExecutionContext) extends LambdaStreamHandler[I, O] {
   final def handle(input: InputStream, output: OutputStream, context: Context): Unit =
-    handle(handleAsync _)(input, output, context)
+    handle(handleAsync)(input, output, context)
 
   final protected def handleAsync(i: I, c: Context): Future[O] = handle(i, c)
 
-  protected def handle(i: I, c: Context): Future[O]
+  def handle(i: I, c: Context): Future[O]
 }

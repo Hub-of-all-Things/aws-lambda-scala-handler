@@ -13,8 +13,8 @@ import scala.util.{Failure, Success, Try}
 abstract class LambdaProxyHandler[I, O]()(implicit val iReads: Reads[I], val oWrites: Writes[O])
   extends LambdaStreamHandler[ProxyRequest[I], ProxyResponse[O]] {
 
-  implicit protected val inputReads: Reads[ProxyRequest[I]] = JsonProtocol.RequestJsonReads[I](iReads)
-  implicit protected val outputWrites: Writes[ProxyResponse[O]] = JsonProtocol.ResponseJsonWrites[O](oWrites)
+  implicit protected val inputReads: Reads[ProxyRequest[I]] = ProxyJsonProtocol.RequestJsonReads[I](iReads)
+  implicit protected val outputWrites: Writes[ProxyResponse[O]] = ProxyJsonProtocol.ResponseJsonWrites[O](oWrites)
 
   final def handle(input: InputStream, output: OutputStream, context: Context): Unit =
     handle(handleAsync _)(input, output, context)
@@ -35,8 +35,8 @@ abstract class LambdaProxyHandler[I, O]()(implicit val iReads: Reads[I], val oWr
 abstract class LambdaProxyHandlerAsync[I, O]()(implicit val iReads: Reads[I], val oWrites: Writes[O])
   extends LambdaStreamHandler[ProxyRequest[I], ProxyResponse[O]] {
 
-  protected implicit val inputReads: Reads[ProxyRequest[I]] = JsonProtocol.RequestJsonReads[I](iReads)
-  protected implicit val outputWrites: Writes[ProxyResponse[O]] = JsonProtocol.ResponseJsonWrites[O](oWrites)
+  protected implicit val inputReads: Reads[ProxyRequest[I]] = ProxyJsonProtocol.RequestJsonReads[I](iReads)
+  protected implicit val outputWrites: Writes[ProxyResponse[O]] = ProxyJsonProtocol.ResponseJsonWrites[O](oWrites)
 
   final def handle(input: InputStream, output: OutputStream, context: Context): Unit =
     handle(handleAsync _)(input, output, context)

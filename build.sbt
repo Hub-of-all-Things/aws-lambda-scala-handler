@@ -4,7 +4,7 @@ import sbt._
 name := "aws-lambda-scala-handler"
 
 organization := "org.hatdex"
-version := "0.0.1"
+version := "0.0.2-SNAPSHOT"
 name := "AWS Lambda Scala Handler"
 description := "Scala utility wrappers for integrating with AWS Lambda functions"
 licenses += ("Mozilla Public License 2.0", url("https://www.mozilla.org/en-US/MPL/2.0"))

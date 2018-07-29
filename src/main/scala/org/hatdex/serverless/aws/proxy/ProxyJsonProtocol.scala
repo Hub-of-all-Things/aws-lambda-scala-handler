@@ -4,7 +4,7 @@ import play.api.libs.json._
 
 import scala.util.{Success, Try}
 
-trait JsonProtocol {
+trait ProxyJsonProtocol {
 
   val errorResponseWrites: Writes[ErrorResponse] = (error: ErrorResponse) => {
     val stackTrace = Option(error.getCause)
@@ -50,4 +50,4 @@ trait JsonProtocol {
   }
 }
 
-object JsonProtocol extends JsonProtocol
+object ProxyJsonProtocol extends ProxyJsonProtocol

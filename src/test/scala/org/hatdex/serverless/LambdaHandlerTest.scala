@@ -25,16 +25,16 @@ trait LambdaSpecContext extends Scope with Mockito {
   import DataJsonProtocol._
 
   class EmptyPingHandler extends LambdaHandler[AnyContent, Pong]() {
-    override protected def handle(i: AnyContent, c: Context): Try[Pong] = {
+    def handle(i: AnyContent, c: Context): Try[Pong] = {
       logger.info("Handling contentless Ping")
       Try(Pong("pong"))
     }
   }
 
+  implicit val executionContext: ExecutionContext = ExecutionContext.global
   class EmptyAsyncHandler extends LambdaHandlerAsync[AnyContent, Pong]() {
-    implicit val executionContext: ExecutionContext = ExecutionContext.global
 
-    override protected def handle(i: AnyContent, c: Context): Future[Pong] = {
+    def handle(i: AnyContent, c: Context): Future[Pong] = {
       logger.info("Handling async Ping")
       Future {
         Thread.sleep(1000)
@@ -44,7 +44,7 @@ trait LambdaSpecContext extends Scope with Mockito {
   }
 
   class PingPongHandler extends LambdaHandler[Ping, Pong]() {
-    override protected def handle(ping: Ping, context: Context): Try[Pong] = {
+    def handle(ping: Ping, context: Context): Try[Pong] = {
       logger.info("Handling Ping")
       Try(Pong(ping.inputMsg.reverse))
     }
