@@ -10,4 +10,6 @@ Note: async call wrappers are also provided primarily for easily integrating wit
 
 For installation, include the following in your `build.sbt`:
 
+```
 libraryDependencies += "org.hatdex" %% "aws-lambda-scala-handler" % "0.0.2-SNAPSHOT",
+```

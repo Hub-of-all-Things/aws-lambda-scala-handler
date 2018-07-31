@@ -17,7 +17,7 @@ abstract class LambdaProxyHandler[I, O]()(implicit val iReads: Reads[I], val oWr
   implicit protected val outputWrites: Writes[ProxyResponse[O]] = ProxyJsonProtocol.ResponseJsonWrites[O](oWrites)
 
   final def handle(input: InputStream, output: OutputStream, context: Context): Unit =
-    handle(handleAsync _)(input, output, context)
+    handle(handleAsync _, handleError _)(input, output, context)
 
   protected val executionContext: ExecutionContext = ExecutionContext.global
   final protected def handleAsync(i: ProxyRequest[I], c: Context): Future[ProxyResponse[O]] = {
@@ -30,6 +30,8 @@ abstract class LambdaProxyHandler[I, O]()(implicit val iReads: Reads[I], val oWr
   protected def handle(i: I, c: Context): Try[O] = handle(c)
 
   protected def handle(c: Context): Try[O] = Failure(BadRequestError("Empty Request Body"))
+
+  protected def handleError(errorResponse: ErrorResponse): ProxyResponse[O] = ProxyResponse(Failure(errorResponse))
 }
 
 abstract class LambdaProxyHandlerAsync[I, O]()(implicit val iReads: Reads[I], val oWrites: Writes[O])
@@ -39,7 +41,7 @@ abstract class LambdaProxyHandlerAsync[I, O]()(implicit val iReads: Reads[I], va
   protected implicit val outputWrites: Writes[ProxyResponse[O]] = ProxyJsonProtocol.ResponseJsonWrites[O](oWrites)
 
   final def handle(input: InputStream, output: OutputStream, context: Context): Unit =
-    handle(handleAsync _)(input, output, context)
+    handle(handleAsync _, handleError _)(input, output, context)
 
   protected implicit val executionContext: ExecutionContext = ExecutionContext.global
   final protected def handleAsync(i: ProxyRequest[I], c: Context): Future[ProxyResponse[O]] = {
@@ -56,4 +58,6 @@ abstract class LambdaProxyHandlerAsync[I, O]()(implicit val iReads: Reads[I], va
   protected def handle(i: I, c: Context): Future[O] = handle(c)
 
   protected def handle(c: Context): Future[O] = Future.failed(BadRequestError("Empty Request Body"))
+
+  protected def handleError(errorResponse: ErrorResponse): ProxyResponse[O] = ProxyResponse(Failure(errorResponse))
 }
